@@ -1,22 +1,26 @@
-﻿#include <iostream>
+﻿/* --->FindRowAndReplace<---- ( ) В массиве А(N,М) найти номер строки, среднее арифметическое положительных элементов
+которой является
+наименьшим и поменять её с первой строкой.*/
+#include <iostream>
 #include <iomanip>
 using namespace std;
-/* --->FindRowAndReplace<---- ( ) В массиве А(N,М) найти номер строки, среднее арифметическое положительных элементов 
-которой является 
-наименьшим и поменять её с первой строкой.*/
-int**& mkArrOfInt(int , int);
-void intRandomArray(int**, int, int, const int , const int);
+int**& mkArrOfInt(int, int);
+void intRandomArray(int**, int, int, const int, const int);
 void intArray(int**, int, int, const int);
 void PrintArray(int**, int, int);
-void FindRowAndReplace(int**, int, int);
+int* FindRow(int**, int, int);
+void FreeMemory(int**&, int);
 int main() {
-	int N =5;
+	int N = 5;
 	int M = 5;
 	int** dest = mkArrOfInt(N, M);
-	intRandomArray(dest, N, M,-10,10);
+	intRandomArray(dest, N, M, -10, 1);
 	PrintArray(dest, N, M);
-	FindRowAndReplace(dest, N, M);
+	int* rowN = FindRow(dest, N, M);
+	swap(dest[0], dest[*rowN]);
 	PrintArray(dest, N, M);
+	FreeMemory(dest, N);
+
 }
 int**& mkArrOfInt(int N, int M) {
 	int** p = new (nothrow) int* [N];
@@ -30,9 +34,10 @@ int**& mkArrOfInt(int N, int M) {
 void FreeMemory(int**& p, int N) {
 	for (size_t i = 0; i < N; i++) {
 		delete[] p[i];
-		delete[] p;
-		p = nullptr;
+
 	}
+	delete[] p;
+	p = nullptr;
 }
 void intRandomArray(int** p, int N, int M, const int m = -10, const int Max = 10) {
 	int d(Max - m + 1);
@@ -49,40 +54,28 @@ void PrintArray(int** p, int N, int M) {
 		for (size_t j = 0; j < M; j++) cout << setw(3) << p[i][j] << ";";
 		cout << '\n';
 	}
+	cout << '\n';
 }
-void FindRowAndReplace (int** p, int N, int M) {
+int* FindRow(int** p, int N, int M) {
+	int* row = nullptr;
 	double sum = 0;
-	double min(1000);
-	int plus(0);
+	double min(1000);//remix below
+	int cnt(0);//cnt
 	for (size_t i = 0; i < N; i++) {
-		for (size_t j = 0; j < M; j++) {
-			if (p[i][j] > 0) {
-			  sum += p[i][j];
-			  ++plus;
-			}
-		}
-		if ((sum / plus) <= min) min = (sum / plus); 
-		plus = 0;
-		sum = 0;
-	}
-	for (size_t i = 0; i < N; i++) {
+		cout << setw(8) << i << p << p[i];
 		for (size_t j = 0; j < M; j++) {
 			if (p[i][j] > 0) {
 				sum += p[i][j];
-				++plus;
+				++cnt;
 			}
 		}
-		if (min == (sum/plus)) {
-			for (size_t j = 0; j < M; j++) {
-				int tmp = p[i][j];
-				p[i][j] = p[0][j];
-				p[0][j] = tmp;
-				
-			}
-			
+		if ((sum / cnt) <= min) {
+			min = (sum / cnt); row = p[i];
 		}
+		cnt = 0;
 		sum = 0;
-		plus = 0;
 	}
+	return row;
 }
+
 
