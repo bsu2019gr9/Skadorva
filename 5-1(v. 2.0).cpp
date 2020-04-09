@@ -25,7 +25,7 @@ public:
         Money rez1,rez2;
         rez1.QuantityBig = this->QuantityBig + rhs.QuantityBig;
         rez2.QuantitySmall = this->QuantitySmall + rhs.QuantitySmall;
-        if (rez2.QuantitySmall >= 100) {
+        if (rez2.QuantitySmall >= 100) {//очень очень неоптимальный код!!!!! есть же операторы %100 и /100
             rez2.QuantitySmall %= 100;
             rez1.QuantityBig += 1;
         }
@@ -34,7 +34,7 @@ public:
         Money operator-(const Money & rhs) {
             Money rez1, rez2;
             rez1.QuantityBig = this->QuantityBig - rhs.QuantityBig;
-            rez2.QuantitySmall = this->QuantitySmall - rhs.QuantitySmall;
+            rez2.QuantitySmall = this->QuantitySmall - rhs.QuantitySmall; // а есои копеек больше у rhs!!!!!!!!!!
             return rez1,rez2;
         };
     
@@ -47,7 +47,7 @@ Money:: Money(void) {
      QuantityBig = 0; QuantitySmall = 0;
      const char* s("without_currency");
      int i(0);
-     do
+     do//про strcpy не слышал!!!!! зачем свой велосипед???????????????7
      {
         Currency[i] = s[i];
      } while (s[i++] != '\0');
