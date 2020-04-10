@@ -3,118 +3,120 @@
 #include <iostream>
 using namespace std;
 struct Money {
-private: 
-    int QuantityBig; 
-    int QuantitySmall;
-    char Currency[4];//пробовал ввести сюда все валюты, но так гораздо проще и понятнее
+private:
+    int QuantityBig;     // $,£ EURO,RUB
+    int QuantitySmall;   // CENT,KOPEK
+    char Currency$[4];   //for $,£ EURO,RUB
+    char CurrencyCent[4];// for  CENT,KOPEK
 public:
-                       //Constructors:
-    Money(void);       //по умолчанию: Student *s=new Student();
-    Money( const char*, int,int); //currency and quantity 
-                       //Student *s2=new Student("Petrov",210);
+    //Constructors:
+    Money(void);       
+    Money(const char*, const char*, int, int);
+                    
     Money(Money&);     //Copy
     ~Money();          //Destructor
-    void setCurrency( const char*); //Функции для получения 
+    void setCurrency(const char*, const char*); //Функции для получения 
     char* getCurrency(void); //и установки свойств
-    void setMoneyQuantity(int, int);  //с атрибутом private
+    void setMoneyQuantity(int, int);
     int getMoneyQuantity(void);
     void showBalance(void);
     void operator=(const Money& rhs);
     //---------------------------------------------------------------------------
     Money operator+(const Money& rhs) {
-        Money rez1,rez2;
+        Money rez1, rez2;
         rez1.QuantityBig = this->QuantityBig + rhs.QuantityBig;
         rez2.QuantitySmall = this->QuantitySmall + rhs.QuantitySmall;
-        if (rez2.QuantitySmall >= 100) {//очень очень неоптимальный код!!!!! есть же операторы %100 и /100
+        if (rez2.QuantitySmall/100) {
             rez2.QuantitySmall %= 100;
             rez1.QuantityBig += 1;
         }
-        return rez1,rez2;
+        return rez1, rez2;
     };
-        Money operator-(const Money & rhs) {
-            Money rez1, rez2;
-            rez1.QuantityBig = this->QuantityBig - rhs.QuantityBig;
-            rez2.QuantitySmall = this->QuantitySmall - rhs.QuantitySmall; // а есои копеек больше у rhs!!!!!!!!!!
-            return rez1,rez2;
-        };
-    
+    Money operator-(const Money& rhs) {
+        Money rez1, rez2;
+        rez1.QuantityBig = this->QuantityBig - rhs.QuantityBig;
+        rez2.QuantitySmall = this->QuantitySmall - rhs.QuantitySmall; 
+        if(rez2.QuantitySmall <0) {
+            rez2.QuantitySmall += 100;
+            rez1.QuantityBig -= 1;
+        }
+        return rez1, rez2;
+    };
+
     //---------------------------------------------------------------
     friend void operator<<(ostream& out, const  Money& v);
     friend void operator>>(istream& in, Money& v);
 };
 
-Money:: Money(void) {
-     QuantityBig = 0; QuantitySmall = 0;
-     const char* s("without_currency");
-     int i(0);
-     do//про strcpy не слышал!!!!! зачем свой велосипед???????????????7
-     {
-        Currency[i] = s[i];
-     } while (s[i++] != '\0');
+Money::Money(void) {
+    QuantityBig = 0; QuantitySmall = 0;
+    strcpy(Currency$, "without_currency-$");
+    strcpy(CurrencyCent, "without_currency-Cent");
 
     cout << "no params constructor working \n";
 }
-Money::Money(const char* newCurrency, int newQuantityBig = 0, int newQuantitySmall = 0) {
-    if (Currency != "without_currency") { strcpy(Currency, newCurrency); QuantityBig = 0; QuantitySmall = 0; }
+Money::Money(const char* newCurrency$, const char* newCurrencyCent, int newQuantityBig = 0, int newQuantitySmall = 0) {
+    if (Currency$ != "without_currency-$" && CurrencyCent != "without_currency-Cent") { strcpy(Currency$, newCurrency$); QuantityBig = 0; QuantitySmall = 0; }
     QuantityBig = newQuantityBig;
     QuantitySmall = newQuantitySmall;
 }
 Money::Money(Money& From) {
-    setCurrency(From.Currency);
+    setCurrency(From.Currency$, From.CurrencyCent);
     setMoneyQuantity(From.QuantityBig, From.QuantitySmall);
-    cout << "copy constructor working for (" << this->Currency << ';' << this->QuantityBig<<';' << this->QuantitySmall; ")\n";
+    cout << "copy constructor working for (" << this->Currency$ << ';' << this->CurrencyCent<< ';' << this->QuantityBig << ';' << this->QuantitySmall; ")\n";
 }
+Money::~Money() { cout << "destructor working for"; }
 
-Money::~Money() { delete Currency; }
 
-void Money::setCurrency(  const char* CurrencyNew) {
-    int n = strlen(CurrencyNew);
-    if (n > 0) {
-        strcpy(Currency, CurrencyNew);
+void Money::setCurrency(const char* CurrencyNew$, const char* CurrencyNewCent) {
+    if ((strlen(CurrencyNew$) && strlen(CurrencyNewCent))>0) {
+        strcpy(Currency$, CurrencyNew$);
+        strcpy(CurrencyCent, CurrencyNewCent);
     }
 }
 
-void Money::setMoneyQuantity(int g, int k) { QuantityBig = g; QuantitySmall = 0; }
+void Money::setMoneyQuantity(int g, int k) { QuantityBig = g; QuantitySmall = k; }
 
-char* Money::getCurrency() { return Currency; }
+char* Money::getCurrency() { return Currency$,CurrencyCent; }
 
-int Money::getMoneyQuantity() { return QuantityBig,QuantitySmall; }
+int Money::getMoneyQuantity() { return QuantityBig, QuantitySmall; }
 
 void Money::showBalance(void) {
- cout<<Currency<<","<< QuantityBig << ","<< QuantitySmall;
+    cout <<"Your balance is : " << QuantityBig << Currency$ << " " << QuantitySmall << CurrencyCent;
 }
 void  Money::operator=(const  Money& rhs)//оператор присваивания
 {
-    cout << "= working for (" << rhs.Currency << ';' << rhs.QuantityBig << ';' << rhs.QuantitySmall; ")\n";
+    cout << "= working for (" << rhs.Currency$  << ' ' << rhs.QuantityBig << ';' << rhs.CurrencyCent << rhs.QuantitySmall; ")\n";
     this->QuantityBig = rhs.QuantityBig;
     this->QuantitySmall = rhs.QuantitySmall;
- 
+
 }
 void operator<<(ostream& out, const  Money& v)
 {
-    out << "(" << v.Currency << ';' << v.QuantityBig  << v.QuantitySmall<<")";
+    out << "(" << v.Currency$ << ' ' << v.QuantityBig << ';' << v.Currency$ << v.QuantitySmall << ")";
 };
 
 void operator>>(istream& in, Money& v)
 {
-    in >> v.Currency;
+    in >> v.Currency$;
+    in >> v.CurrencyCent;
     in >> v.QuantityBig;
     in >> v.QuantitySmall;
 }
 
 int main() {
     Money* rub = new Money();
-    Money* dollar = new Money("dollar",9);
-    rub->setMoneyQuantity(58,20);
-    Money* centEuropa = new Money("centEuropa", 319);
+    Money* dollar = new Money("dollar","cent", 9,25);
+    rub->setMoneyQuantity(58, 20);
+    Money* Euro = new Money("Euro","centEuropa", 319,24);
     rub->showBalance();
     dollar->showBalance();
-    centEuropa->showBalance();
-    delete centEuropa;
-    Money kopek("kopek", 21);
-    kopek.showBalance();
-    kopek = *dollar;
-    kopek.showBalance();
+    Euro->showBalance();
+    delete Euro;
+    Money Rub("Rub","kopek", 21,50);
+    Rub.showBalance();
+    Rub = *dollar;
+    Rub.showBalance();
     system("pause");
     return 0;
 }
