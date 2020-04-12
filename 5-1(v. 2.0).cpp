@@ -6,41 +6,38 @@ struct Money {
 private:
     int QuantityBig;     // $,£ EURO,RUB
     int QuantitySmall;   // CENT,KOPEK
-    char Currency$[4];   //for $,£ EURO,RUB
-    char CurrencyCent[4];// for  CENT,KOPEK
+    char Currency$[20];   //for $,£ EURO,RUB
+    char CurrencyCent[20];// for  CENT,KOPEK
 public:
     //Constructors:
-    Money(void);       
-    Money(const char*, const char*, int, int);
+    Money( void);       
+    Money(const char*, const char*,  const int,const  int);
                     
-    Money(Money&);     //Copy
+    Money( const Money&);     //Copy
     ~Money();          //Destructor
     void setCurrency(const char*, const char*); //Функции для получения 
     char* getCurrency(void); //и установки свойств
-    void setMoneyQuantity(int, int);
+    void setMoneyQuantity( const int,  const int);
     int getMoneyQuantity(void);
     void showBalance(void);
     void operator=(const Money& rhs);
     //---------------------------------------------------------------------------
     Money operator+(const Money& rhs) {
-        Money rez1, rez2;
-        rez1.QuantityBig = this->QuantityBig + rhs.QuantityBig;
-        rez2.QuantitySmall = this->QuantitySmall + rhs.QuantitySmall;
-        if (rez2.QuantitySmall/100) {
-            rez2.QuantitySmall %= 100;
-            rez1.QuantityBig += 1;
-        }
-        return rez1, rez2;
+        Money rez;
+        rez.QuantityBig = this->QuantityBig + rhs.QuantityBig;
+        return rez;
     };
     Money operator-(const Money& rhs) {
-        Money rez1, rez2;
-        rez1.QuantityBig = this->QuantityBig - rhs.QuantityBig;
-        rez2.QuantitySmall = this->QuantitySmall - rhs.QuantitySmall; 
-        if(rez2.QuantitySmall <0) {
-            rez2.QuantitySmall += 100;
-            rez1.QuantityBig -= 1;
-        }
-        return rez1, rez2;
+        Money rez;
+        rez.QuantityBig = this->QuantityBig - rhs.QuantityBig;
+        return rez;
+    };
+    bool operator==( const Money& rhs) {
+        if (this->QuantityBig == rhs.QuantityBig) return true;
+        else return false;
+    }
+    bool operator!=(const Money& rhs) {
+        return !(this->QuantityBig == rhs.QuantityBig);
     };
 
     //---------------------------------------------------------------
@@ -50,17 +47,17 @@ public:
 
 Money::Money(void) {
     QuantityBig = 0; QuantitySmall = 0;
-    strcpy(Currency$, "without_currency-$");
-    strcpy(CurrencyCent, "without_currency-Cent");
+    strcpy(Currency$, "no_currency-$");
+    strcpy(CurrencyCent, "no_currency-Cent");
 
     cout << "no params constructor working \n";
 }
-Money::Money(const char* newCurrency$, const char* newCurrencyCent, int newQuantityBig = 0, int newQuantitySmall = 0) {
-    if (Currency$ != "without_currency-$" && CurrencyCent != "without_currency-Cent") { strcpy(Currency$, newCurrency$); QuantityBig = 0; QuantitySmall = 0; }
-    QuantityBig = newQuantityBig;
-    QuantitySmall = newQuantitySmall;
+Money::Money(const char* newCurrency$, const char* newCurrencyCent,  const int newQuantityBig = 0,const int newQuantitySmall = 0) {
+    if (Currency$ != "without_currency-$" && CurrencyCent != "without_currency-Cent") { strcpy(Currency$, newCurrency$); strcpy(CurrencyCent, newCurrencyCent); }
+    QuantityBig = newQuantityBig*100+ newQuantitySmall;
+    QuantitySmall=0;
 }
-Money::Money(Money& From) {
+Money::Money( const Money& From) {
     setCurrency(From.Currency$, From.CurrencyCent);
     setMoneyQuantity(From.QuantityBig, From.QuantitySmall);
     cout << "copy constructor working for (" << this->Currency$ << ';' << this->CurrencyCent<< ';' << this->QuantityBig << ';' << this->QuantitySmall; ")\n";
@@ -75,20 +72,21 @@ void Money::setCurrency(const char* CurrencyNew$, const char* CurrencyNewCent) {
     }
 }
 
-void Money::setMoneyQuantity(int g, int k) { QuantityBig = g; QuantitySmall = k; }
+void Money::setMoneyQuantity( const int g,const int k) { QuantityBig = g * 100 + k;//all money in cents
+ QuantitySmall = 0; }
 
 char* Money::getCurrency() { return Currency$,CurrencyCent; }
 
-int Money::getMoneyQuantity() { return QuantityBig, QuantitySmall; }
+int Money::getMoneyQuantity() { return QuantityBig/100, QuantityBig%100; }
 
 void Money::showBalance(void) {
-    cout <<"Your balance is : " << QuantityBig << Currency$ << " " << QuantitySmall << CurrencyCent;
+    cout <<"Your balance is : " << QuantityBig/100 << Currency$ << " " << QuantityBig%100 << CurrencyCent;
 }
 void  Money::operator=(const  Money& rhs)//оператор присваивания
 {
-    cout << "= working for (" << rhs.Currency$  << ' ' << rhs.QuantityBig << ';' << rhs.CurrencyCent << rhs.QuantitySmall; ")\n";
-    this->QuantityBig = rhs.QuantityBig;
-    this->QuantitySmall = rhs.QuantitySmall;
+    cout << "= working for (" << rhs.Currency$  << ' ' << rhs.QuantityBig/100 << ';' << rhs.CurrencyCent << rhs.QuantityBig%100; ")\n";
+    this->QuantityBig = rhs.QuantityBig/100;
+    this->QuantitySmall = rhs.QuantityBig%100;
 
 }
 void operator<<(ostream& out, const  Money& v)
