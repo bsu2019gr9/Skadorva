@@ -5,10 +5,10 @@
 using namespace std;
 struct Money {
 private:
-   char* BankAccountArray= nullptr;
+   char* BankAccountArray= nullptr;//это чо?????
     int QuantityBig;     // $,£ EURO,RUB
     int QuantitySmall;   // CENT,KOPEK
-    char Currency$[20];   //for $,£ EURO,RUB
+    char Currency$[20];   //for $,£ EURO,RUB // 20??? зачем так много???????? разве 4 не хватит????????
     char CurrencyCent[20];// for  CENT,KOPEK
 public:
     //Constructors:
@@ -24,22 +24,22 @@ public:
     void showBalance(void);
     void operator=(const Money& rhs);
     //---------------------------------------------------------------------------
-    Money operator+(const Money& rhs) {
-        Money rez;
+    Money operator+(const Money& rhs) { //совсем плохо!!!!
+        Money rez;//никаких проверок что с чем складываем!!!!! Т.е. я могу 2$+3руб 50коп
         rez.QuantityBig = this->QuantityBig + rhs.QuantityBig;
         return rez;
     };
-    Money operator-(const Money& rhs) {
+    Money operator-(const Money& rhs) {//плохо
         Money rez;
         rez.QuantityBig = this->QuantityBig - rhs.QuantityBig;
         return rez;
     };
-    bool operator==( const Money& rhs) {
-        if (this->QuantityBig == rhs.QuantityBig) return true;
+    bool operator==( const Money& rhs) {//неверно!!!!
+        if (this->QuantityBig == rhs.QuantityBig) return true; //т.е. у тебя 2$50c равно 2$55c
         else return false;
     }
-    bool operator!=(const Money& rhs) {
-        return !(this->QuantityBig == rhs.QuantityBig);
+    bool operator!=(const Money& rhs) {//плохо
+        return !(this->QuantityBig == rhs.QuantityBig);//классически оператор != реализуется через уже к этому моменту написаному оператору ==
     };
 
     //---------------------------------------------------------------
@@ -99,7 +99,7 @@ void BubbleSort(int* b, int* e)
             if (*ip > * jp)swap(*ip, *jp);
         }
 }
-void mkOFarr(int n, int *p) {//
+void mkOFarr(int n, int *p) {//ой, как плохо!!!!! р в main НЕ ПОМЕНЯЕТСЯ!!!!!!!!
     p = new (nothrow) int[n];
     if (!p) exit(404);
 };
