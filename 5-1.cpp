@@ -1,9 +1,11 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 //Класс деньги(рубли/доллары/евро,копейки/центы/евроценты).
 #include <iostream>
+#include <fstream>
 using namespace std;
 struct Money {
 private:
+   char* BankAccountArray= nullptr;
     int QuantityBig;     // $,£ EURO,RUB
     int QuantitySmall;   // CENT,KOPEK
     char Currency$[20];   //for $,£ EURO,RUB
@@ -44,7 +46,63 @@ public:
     friend void operator<<(ostream& out, const  Money& v);
     friend void operator>>(istream& in, Money& v);
 };
+typedef  int pToArr;
+void PrintArray(int* b, int* e) {
+    for (int* p = b; b < e; ++p)
+        cout << *p;
+};
+void reverse(int* b, int* e) {
+    --e;
+    while (b < e) {swap(*b, *e); ++b; --e;}
+};
+void inputArray(int* b, int* e) {
+    for (int* p = b; b < e; ++p)
+        cin >> *p;
+}
 
+void freeMemory(pToArr*& p) { delete[] p; p = nullptr; };//
+void initArray(int* b, int* e, const int m) {
+    for (int* p = b; b < e; ++p)
+        *p = m;
+};
+void initRandomArray(int* b, int* e, const int m = -10, const int M = 10) {
+    int d = (M - m + 1);
+    for (int* p = b; b < e; ++ * p)
+        *p = rand() % d + m;
+};
+void initSortRandArr(int* b, int* e, const int m = -10, const int M = 10) {
+    int d = (M - m + 1);
+    for (int* p = b; b < e; ++ * p)
+        *p = rand() % d + m;
+}
+int findMax(int* b, int* e) {
+    int max = *b;
+    for (int* p = 0; b < e; ++ * p)if (*p > max)max = *p;
+    return max;
+}
+int findMin(int* b, int* e) {
+    int min = *b;
+    for (int* p = 0; b < e; ++ * p)if (*p > min)min = *p;
+    return min;
+}
+int findSum(int* b, int* e) {
+    int s = 0;
+    for (int* p = 0; b < e; ++p)
+        s += *p;
+    return s;
+}
+void BubbleSort(int* b, int* e)
+{
+    for (int* ip = b; ip < e; ++ip)
+        for (int* jp = b; jp < e; ++jp)
+        {
+            if (*ip > * jp)swap(*ip, *jp);
+        }
+}
+void mkOFarr(int n, int *p) {//
+    p = new (nothrow) int[n];
+    if (!p) exit(404);
+};
 Money::Money(void) {
     QuantityBig = 0; QuantitySmall = 0;
     strcpy(Currency$, "no_currency-$");
@@ -101,8 +159,39 @@ void operator>>(istream& in, Money& v)
     in >> v.QuantityBig;
     in >> v.QuantitySmall;
 }
+void ReadFile( char* UsersAccount, int size) {
+    ifstream fin("input.txt");
+    ofstream fout("result.txt");
+    int curr_account = 0;
+    while (true)
+    {
 
+        fin.getline(UsersAccount, size);
+        if (fin.eof())
+            break;
+        if (fin.fail()) fin.clear();
+        char* Account = strtok(UsersAccount, " ,…–][:;*.( )«—»!? -\"\t");
+        while (Account)
+        {
+            fout << curr_account << ": ";
+            for (int i = 0; i < 5; i++) {// Ivanov 15 dollars 24 cents
+                fout << Account << " ";
+                Account = strtok(NULL, " ,…–[]:;*.( )«»—!? -\"\t");
+            }
+            fout << "\n";
+            curr_account++;
+        }
+    }
+}
 int main() {
+    int MAX_SIZE = 1000000;
+    char* BankAccountArray1 = new char[MAX_SIZE];
+    ReadFile(BankAccountArray1, MAX_SIZE);
+
+    char* BankAccountArray2 = new char[MAX_SIZE];
+    int*  dest = nullptr;
+    inputArray(dest, dest + MAX_SIZE);
+
     Money* rub = new Money();
     Money* dollar = new Money("dollar","cent", 9,25);
     rub->setMoneyQuantity(58, 20);
