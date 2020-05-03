@@ -10,8 +10,8 @@ struct Money {
 private:
     int  QuantityBig;    
     int  QuantitySmall;  
-    char Currency$[4];
-    char CurrencyCent[4];
+    char Currency$[20];
+    char CurrencyCent[20];
 public:
     Money(void);
     Money(const char*, const char*, const int, const  int);
