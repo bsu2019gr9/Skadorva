@@ -114,10 +114,9 @@ std::ostream& operator<< (std::ostream& out, Footballer* Team)
 	return out;
 }
 Footballer createFootballer() {
-	Footballer NewFootballer;
-	cin >> NewFootballer;
-	return NewFootballer;
-	}
+	Footballer createdFootballer; cin >> createdFootballer; 
+	return createdFootballer;
+}
 Footballer deleteFootballer(Footballer& footballer) {
 	delete[]footballer.name;	footballer.name = nullptr;
 	delete[]footballer.team;	footballer.team = nullptr;
