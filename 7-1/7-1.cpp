@@ -113,17 +113,6 @@ std::ostream& operator<< (std::ostream& out, Footballer* Team)
 	for (int i(0); i < N; ++i) { Team[i].printFootballer();	cout << '\n';}
 	return out;
 }
-
-Footballer createFootballer(const char Name[20], const char Team[20], short Age, short Games, short Goals, short Assists) {
-	Footballer NewFootballer;
-	NewFootballer.name = new (nothrow) char[strlen(Name) + 1];  strcpy(NewFootballer.name, Name);
-	NewFootballer.team = new (nothrow) char[strlen(Team) + 1]; 	strcpy(NewFootballer.team, Team);
-	NewFootballer.age = Age;
-	NewFootballer.games = Games;
-	NewFootballer.goals = Goals;
-	NewFootballer.assists = Assists;
-	return NewFootballer;
-}
 Footballer createFootballer() {
 	Footballer NewFootballer;
 	cin >> NewFootballer;
