@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -33,16 +33,6 @@ public:
 		delete[]name; name = nullptr;
 		delete[]team; team = nullptr;
 	}
-	void printFootballer() const {
-		if (!name || !team) return; cout.setf(ios::left);
-		cout << setw(15) << name << "|" << setw(15) << team << "|" << setw(15) << age << "|" << setw(15) << games << "|" << setw(15) << goals << "|" << setw(15) << assists << "|";
-	}
-	char* getName() const {return name;}
-	char* getTeam() const { return team; }
-	short getAge() const {return age;}
-	short getAssists() const { return assists; }
-	short getGames() const {return games;}
-	short getGoals() const {return goals;}
 	Footballer operator=(Footballer footballer) {
 		if (!name) delete[]name; name = nullptr;
 		if (!team) delete[]team; team = nullptr;
@@ -54,11 +44,33 @@ public:
 		assists = footballer.assists;
 		return *this;
 	}
-	friend Footballer createFootballer(const char[20], const char[20], short, short, short, short);
-	friend Footballer deleteFootballer(Footballer&);
+	void printFootballer() const {
+		if (!name || !team) return; cout.setf(ios::left);
+		cout << setw(15) << name << "|" << setw(15) << team << "|" << setw(15) << age << "|" << setw(15) << games << "|" << setw(15) << goals << "|" << setw(15) << assists << "|";
+	}
+	char* getName() const { return name; }
+	char* getTeam() const { return team; }
+	short getAge() const { return age; }
+	short getAssists() const { return assists; }
+	short getGames() const { return games; }
+	short getGoals() const { return goals; }
+	void setName(const char newName[20]) {
+		delete[]name; name = nullptr;
+		name = new char[strlen(newName) + 1]; strcpy(name, newName);
+	}
+	void setTeam(const char newTeam[20]) {
+		delete[]team; team = nullptr;
+		team = new char[strlen(newTeam) + 1]; strcpy(team, newTeam);
+	}
+	void setAge(int Age) {Footballer NewFootballer; NewFootballer.age = Age;}
+	void setAssists(int Assists) { Footballer NewFootballer; NewFootballer.assists = Assists; }
+	void setGoals(int Goals) { Footballer NewFootballer; NewFootballer.goals = Goals; }
+	void setGames(int Games) { Footballer NewFootballer; NewFootballer.games = Games; }
+
 	friend std::istream& operator>> (std::istream& in, Footballer&);
 	friend std::ostream& operator<< (std::ostream& out, const Footballer&);
-
+	friend Footballer createFootballer(const char[20], const char[20], short, short, short, short);
+	friend Footballer deleteFootballer(Footballer&);
 	friend Footballer editName(Footballer&);
 	friend Footballer editTeam(Footballer&);
 	friend Footballer editAge(Footballer&);
@@ -67,6 +79,7 @@ public:
 	friend Footballer editGames(Footballer&);
 	friend Footballer editFootballer(Footballer&, const char[7], int);
 	friend Footballer* writeToFile(const char[30], Footballer*, int);
+	friend Footballer* writeToFileBin (Footballer*, int, const char[30]);
 
 
 };
@@ -113,10 +126,22 @@ std::ostream& operator<< (std::ostream& out, Footballer* Team)
 	for (int i(0); i < N; ++i) { Team[i].printFootballer();	cout << '\n';}
 	return out;
 }
-Footballer createFootballer() {
-	Footballer createdFootballer; cin >> createdFootballer; 
-	return createdFootballer;
+
+Footballer createFootballer(const char Name[20], const char Team[20], short Age, short Games, short Goals, short Assists) {
+	Footballer NewFootballer;
+	NewFootballer.name = new (nothrow) char[strlen(Name) + 1];  strcpy(NewFootballer.name, Name);
+	NewFootballer.team = new (nothrow) char[strlen(Team) + 1]; 	strcpy(NewFootballer.team, Team);
+	NewFootballer.age = Age;
+	NewFootballer.games = Games;
+	NewFootballer.goals = Goals;
+	NewFootballer.assists = Assists;
+	return NewFootballer;
 }
+Footballer createFootballer() {
+	Footballer NewFootballer;
+	cin >> NewFootballer;
+	return NewFootballer;
+	}
 Footballer deleteFootballer(Footballer& footballer) {
 	delete[]footballer.name;	footballer.name = nullptr;
 	delete[]footballer.team;	footballer.team = nullptr;
@@ -223,6 +248,36 @@ Footballer* writeToFile(const char wayToFile[30], Footballer* Team, int N) {
 		fout << Team[i].name << " " << Team[i].team << " " << Team[i].age << " " << Team[i].games << " " << Team[i].goals << " " << Team[i].assists << '\n';
 	}
 	return Team;
+}
+Footballer* readFromFileBin(Footballer* footballer, const int  size,const char wayToFile[30]) {
+	ifstream fin(wayToFile, ios::binary);//c:\\IT\\Team.bin
+	if (!fin) { cout << "No file" << wayToFile << "Can't open\n"; exit(1); }
+	const int sizetmp(20);char ctmp[sizetmp];
+	const int itmp(0);
+	for (int i(0); i < size; i++) {
+			fin.read((char*)&ctmp, sizetmp); if (fin.eof())break; footballer[count].setName(ctmp);
+			fin.read((char*)&ctmp, sizetmp); footballer[count].setTeam(ctmp);
+			fin.read((char*)&itmp, sizeof(int)); footballer[count].setAge(itmp);
+			fin.read((char*)&itmp, sizeof(int)); footballer[count].setAssists(itmp);
+			fin.read((char*)&itmp, sizeof(int)); footballer[count].setGames(itmp);
+			fin.read((char*)&itmp, sizeof(int)); footballer[count].setGoals(itmp);
+		}
+	fin.close();
+	return footballer;
+}
+Footballer* writeToFileBin(Footballer* footballer, const int  size, const char wayToFile[30]) {
+	ofstream fout(wayToFile, ios::binary);
+	if (!fout) { cout << "No  file" << wayToFile << ". Can't create\n"; exit(1); }
+	const int sizetmp(20); char ctmp[sizetmp];   int itmp(0);
+	for (int i(0); i < size;i++) {
+		strcpy(ctmp, footballer[i].getName()); fout.write((char*)&ctmp, sizetmp);
+		strcpy(ctmp, footballer[i].getTeam()); fout.write((char*)&ctmp, sizetmp);
+		itmp = footballer[i].getAssists(); fout.write((char*)&itmp, sizeof(int));
+		itmp = footballer[i].getAge(); fout.write((char*)&itmp, sizeof(int));
+		itmp = footballer[i].getGoals(); fout.write((char*)&itmp, sizeof(int));
+		itmp = footballer[i].getGames(); fout.write((char*)&itmp, sizeof(int));
+	}
+	return footballer;
 }
 Footballer* sortTeamByName(Footballer* Team) {
 	int size = *((size_t*)Team - 1);
@@ -457,5 +512,4 @@ int main() {
 		}
 	}break;
 	}
-	
 }
